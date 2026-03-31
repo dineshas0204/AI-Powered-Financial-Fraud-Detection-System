@@ -5,7 +5,7 @@ import {
 } from "recharts";
 import { Shield, AlertTriangle, CheckCircle, Activity, DollarSign, Eye, RefreshCw, Send, Zap } from "lucide-react";
 
-const API = "http://localhost:8000";
+const API = "https://ai-powered-financial-fraud-detection-yax2.onrender.com"
 
 // ──────────────────────────────────────────────
 // Color palette
