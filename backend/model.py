@@ -1,8 +1,4 @@
-"""
-Fraud Detection ML Model
-Uses Random Forest + XGBoost ensemble with SMOTE for class imbalance.
-Run: python model.py
-"""
+
 import pandas as pd
 import numpy as np
 import joblib
@@ -28,14 +24,14 @@ def load_and_preprocess(csv_path='transactions.csv'):
     df['merchant_category_encoded'] = le.fit_transform(df['merchant_category'])
     
     # Save label encoder mapping
-    mapping = {k: int(v) for k, v in zip(le.classes_, le.transform(le.classes_))}
+    mapping = dict(zip(le.classes_, le.transform(le.classes_)))
     with open('label_encoder.json', 'w') as f:
         json.dump(mapping, f)
     
     return df, le
 
 def train_model(csv_path='transactions.csv'):
-    print("???? Loading data...")
+    print("📥 Loading data...")
     df, le = load_and_preprocess(csv_path)
     
     X = df[FEATURE_COLS]
@@ -50,7 +46,7 @@ def train_model(csv_path='transactions.csv'):
     )
     
     # Handle class imbalance with SMOTE
-    print("\n??????  Applying SMOTE to balance classes...")
+    print("\n⚖️  Applying SMOTE to balance classes...")
     smote = SMOTE(random_state=42)
     X_train_balanced, y_train_balanced = smote.fit_resample(X_train, y_train)
     print(f"   Balanced training set: {len(X_train_balanced):,} samples")
@@ -61,7 +57,7 @@ def train_model(csv_path='transactions.csv'):
     X_test_scaled = scaler.transform(X_test)
     
     # Train Random Forest
-    print("\n???? Training Random Forest...")
+    print("\n🌲 Training Random Forest...")
     rf_model = RandomForestClassifier(
         n_estimators=100,
         max_depth=15,
@@ -73,7 +69,7 @@ def train_model(csv_path='transactions.csv'):
     rf_model.fit(X_train_scaled, y_train_balanced)
     
     # Train Gradient Boosting
-    print("???? Training Gradient Boosting...")
+    print("🚀 Training Gradient Boosting...")
     gb_model = GradientBoostingClassifier(
         n_estimators=100,
         learning_rate=0.1,
@@ -89,7 +85,7 @@ def train_model(csv_path='transactions.csv'):
     ensemble_pred = (ensemble_proba >= 0.5).astype(int)
     
     # Evaluate
-    print("\n???? Model Performance:")
+    print("\n📊 Model Performance:")
     print("=" * 50)
     auc = roc_auc_score(y_test, ensemble_proba)
     print(f"ROC-AUC Score: {auc:.4f}")
@@ -102,12 +98,12 @@ def train_model(csv_path='transactions.csv'):
     # Feature importance
     importance = dict(zip(FEATURE_COLS, rf_model.feature_importances_))
     importance_sorted = dict(sorted(importance.items(), key=lambda x: x[1], reverse=True))
-    print(f"\n???? Top Feature Importances:")
+    print(f"\n🔍 Top Feature Importances:")
     for feat, imp in list(importance_sorted.items())[:5]:
         print(f"   {feat}: {imp:.4f}")
     
     # Save models
-    print("\n???? Saving models...")
+    print("\n💾 Saving models...")
     joblib.dump(rf_model, 'rf_model.pkl')
     joblib.dump(gb_model, 'gb_model.pkl')
     joblib.dump(scaler, 'scaler.pkl')
@@ -120,7 +116,7 @@ def train_model(csv_path='transactions.csv'):
     with open('model_metrics.json', 'w') as f:
         json.dump(metrics, f, indent=2)
     
-    print("??? Models saved: rf_model.pkl, gb_model.pkl, scaler.pkl")
+    print("✅ Models saved: rf_model.pkl, gb_model.pkl, scaler.pkl")
     return rf_model, gb_model, scaler
 
 if __name__ == '__main__':
