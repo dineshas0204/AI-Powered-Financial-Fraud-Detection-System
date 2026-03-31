@@ -24,7 +24,7 @@ def load_and_preprocess(csv_path='transactions.csv'):
     df['merchant_category_encoded'] = le.fit_transform(df['merchant_category'])
     
     # Save label encoder mapping
-    mapping = dict(zip(le.classes_, le.transform(le.classes_)))
+    mapping = {k: int(v) for k, v in zip(le.classes_, le.transform(le.classes_))}
     with open('label_encoder.json', 'w') as f:
         json.dump(mapping, f)
     
